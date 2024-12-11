@@ -86,9 +86,46 @@
   for(int i = 0; i < nelems; i++) {                    \
     temp[i] = rand() % (0x1llu << (sizeof(type) * 8)); \
   }                                                    \
+                                                       \
   temp;                                                \
 })
 #endif
+
+#define __ALLOC_FLOAT_DATA(nelems) ({                  \
+  unsigned int nbytes = (nelems) * sizeof(float);      \
+  float *temp = (float *)aligned_alloc(64, nbytes);    \
+                                                       \
+  if (temp == NULL) {                                  \
+    printf("\n");                                      \
+    printf("  ERROR: Cannot allocate memory!");        \
+    printf("\n");                                      \
+    printf("\n");                                      \
+    exit(-2);                                          \
+  }                                                    \
+                                                       \
+  temp;                                                \
+})
+
+
+#define __ALLOC_INIT_FLOAT_DATA(nelems) ({             \
+  unsigned int nbytes = (nelems) * sizeof(float);      \
+  float *temp = (float *)aligned_alloc(64, nbytes);    \
+                                                       \
+  if (temp == NULL) {                                  \
+    printf("\n");                                      \
+    printf("  ERROR: Cannot allocate memory!");        \
+    printf("\n");                                      \
+    printf("\n");                                      \
+    exit(-2);                                          \
+  }                                                    \
+                                                       \
+  /* Generate Random Floats*/                          \
+  for(int i = 0;i < nelems; i++) {                     \
+    temp[i] = ((float)rand()/(float)(RAND_MAX))*511+1; \
+  }                                                    \
+                                                       \
+  temp;                                                \
+})
 
 #define __SET_GUARD(array, sz) {                       \
   ((byte*)array)[sz + 0] = 0xfe;                       \
@@ -122,7 +159,7 @@
                                                        \
   match = match && (((byte*)array)[sz + 0] == 0xfe);   \
   match = match && (((byte*)array)[sz + 1] == 0xca);   \
-  match = match && (((byte*)array)[sz + 2] == 0xad);   \
+  match = match && (((byte*)array)[sz + 2] == 0xca);   \
   match = match && (((byte*)array)[sz + 3] == 0xde);   \
                                                        \
   match;                                               \
